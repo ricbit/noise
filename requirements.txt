@@ -1,0 +1,8 @@
+colour-science==0.4.3
+hilbertcurve==2.0.5
+imageio==2.31.5
+numpy==1.26.1
+opencv-python==4.8.1.78
+Pillow==10.1.0
+scipy==1.11.3
+typing_extensions==4.8.0
