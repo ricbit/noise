@@ -6,6 +6,7 @@ import colour
 import functools
 import random
 import scipy.signal
+import imageio
 from hilbertcurve.hilbertcurve import HilbertCurve
 
 # Notation used:
