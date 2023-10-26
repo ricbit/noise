@@ -9,7 +9,7 @@ import scipy.signal
 from hilbertcurve.hilbertcurve import HilbertCurve
 
 # Notation used:
-# SCREEN 2 = fixed 15 colors, 256x192, 2 colors for octet
+# SCREEN 2 = fixed 15 colors, 256x192, 2 colors each 8x1
 # SCREEN 5 = fixed 15 colors, 256x192
 # SCREEN 8 = fixed 256 colors, 256x192
 
@@ -184,16 +184,20 @@ def quantize_average(image, palette_func):
     cv2.imshow('Meanwhile', canvas2.astype(np.uint8))
     cv2.waitKey(1)
 
-# Quantize image by comparing random color to avergae (Oklab colorspace).
-def quantize_random(image, palette):
+# Display one frame on the window manager.
+def display_screen(screen):
+  canvas = Oklab_to_sRGB(screen)
+  canvas = blowup(canvas, 4)
+  cv2.imshow('Meanwhile', canvas)
+  cv2.waitKey(1)
+
+# Quantize image by comparing random color to average (Oklab colorspace).
+def quantize_random(image, palette, display):
   canvas = np.zeros((192, 256, 3), dtype=float)
   pixels = list(itertools.product(range(256), range(192)))
   for frame in range(10000):
     print(frame)
-    canvas2 = Oklab_to_sRGB(canvas)
-    canvas2 = blowup(canvas2, 4)
-    cv2.imshow('Meanwhile', canvas2)
-    cv2.waitKey(1)
+    display(canvas)
     random.shuffle(pixels)
     for x, y in pixels:
       size = random.randint(0, 0)
@@ -204,8 +208,6 @@ def quantize_random(image, palette):
       canvas[y][x] = palette[choose]
       nav, area = average_pixel(canvas, x, y, size)
       canvas[y][x] = np.copy(save)
-      #if np.linalg.norm(palette[choose] - image[y][x]) < np.linalg.norm(
-      #    canvas[y][x] - image[y][x]):
       if np.linalg.norm(nav - iav) < np.linalg.norm(cav - iav):
         canvas[y][x] = np.copy(palette[choose])
 
@@ -254,7 +256,7 @@ rgb_image = cv2.imread(sys.argv[1])
 canvas = rgb_image
 canvas = sRGB_to_Oklab(canvas)
 canvas = resize_image(canvas, 256, 192)
-canvas = quantize_2d(canvas, msx_oklab_func)
+#canvas = quantize_2d(canvas, msx_oklab_func)
 #canvas1 = resize_image(rgb_image, 256, 192)
 #canvas1 = quantize(canvas1, msx_rgb_func)
 #canvas = quantize_2d(canvas, msx_rgb_func)
@@ -262,7 +264,7 @@ canvas = quantize_2d(canvas, msx_oklab_func)
 #canvas = quantize_2d(canvas, msx_oklab_scr8_func)
 #canvas = quantize_1d(canvas, msx_oklab_func, gen_hilbert())
 #canvas = quantize_1d(canvas, msx_rgb_func, gen_hilbert())
-#canvas = quantize_random_oklab(canvas, msx_oklab)
+canvas = quantize_random(canvas, msx_oklab, display_screen)
 #canvas = quantize_random_oklab(canvas, msx_oklab)
 # canvas = quantize_random_scr2(canvas, msx_rgb)
 #canvas = draw_curve(canvas, gen_hilbert(), 4)
