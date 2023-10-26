@@ -192,6 +192,14 @@ def display_screen(screen):
   cv2.imshow('Meanwhile', canvas)
   cv2.waitKey(1)
 
+# Save animated gif
+def save_animated_gif(screen, frames=[]):
+  canvas = cv2.cvtColor(Oklab_to_sRGB(screen), cv2.COLOR_RGB2BGR)
+  canvas = blowup(canvas, 4)
+  frames.append(np.copy(canvas))
+  if len(frames) == 50:
+    imageio.mimsave("output.gif", frames, duration=0.2, palettesize=256)
+
 # Quantize image by comparing random color to average (Oklab colorspace).
 def quantize_random(image, palette, display):
   canvas = np.zeros((192, 256, 3), dtype=float)
@@ -265,7 +273,8 @@ canvas = resize_image(canvas, 256, 192)
 #canvas = quantize_2d(canvas, msx_oklab_scr8_func)
 #canvas = quantize_1d(canvas, msx_oklab_func, gen_hilbert())
 #canvas = quantize_1d(canvas, msx_rgb_func, gen_hilbert())
-canvas = quantize_random(canvas, msx_oklab, display_screen)
+#canvas = quantize_random(canvas, msx_oklab, display_screen)
+canvas = quantize_random(canvas, msx_oklab, save_animated_gif)
 #canvas = quantize_random_oklab(canvas, msx_oklab)
 # canvas = quantize_random_scr2(canvas, msx_rgb)
 #canvas = draw_curve(canvas, gen_hilbert(), 4)
